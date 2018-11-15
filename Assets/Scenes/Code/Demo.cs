@@ -6,23 +6,17 @@ public class Demo : MonoBehaviour
 {
     public GameObject TilePrefab;
     public Vector2Int GridSize;
+    [SerializeField]
+    private Renderer render;
 
     // Use this for initialization
     void Start ()
     {
-        Vector2 tileDim = TilePrefab.GetComponent<Renderer>().bounds.size;
-        var level = new Level(tileDim, GridSize);
+        var level = new Level(GridSize);
         BSPAlgorithm.Apply(level, BSPAlgorithm.Parameters.Default, 100);
 
         Tile firstFloor = null;
         Tile secondFloor = null;
-
-        foreach (var tile in level.Grid.Tiles)
-        {
-            var obj = Instantiate(TilePrefab, tile.TransformPosition, Quaternion.identity, transform);
-            obj.GetComponent<SpriteRenderer>().color = tile.Type == Tile.Types.Floor ? Color.gray : Color.black;
-            tile.attached = obj;
-        }
 
         int count = 0;
         //Random.InitState(563534); // 4-5 ms  
@@ -71,11 +65,9 @@ public class Demo : MonoBehaviour
 
         foreach (var item in path)
         {
-            item.GetToNode.Node.attached.GetComponent<SpriteRenderer>().color = Color.red;
+            //item.GetToNode.Node.attached.GetComponent<SpriteRenderer>().color = Color.red;
         }
-
-        firstFloor.attached.GetComponent<SpriteRenderer>().color = Color.blue;
-        secondFloor.attached.GetComponent<SpriteRenderer>().color = Color.green;
+        render.Init(level.Grid.Tiles, GridSize);
     }
 	
 	// Update is called once per frame

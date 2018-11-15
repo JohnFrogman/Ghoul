@@ -7,8 +7,8 @@ public class Level
     public Grid Grid { get; private set; }
     public HashSet<Tile[,]> Rooms;
 
-    public Level(Vector2 tileDim, Vector2Int GridSize)
+    public Level(Vector2Int GridSize)
     {
-        Grid = new Grid(tileDim, GridSize);
+        Grid = new Grid(GridSize);
     }
 }

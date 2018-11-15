@@ -142,7 +142,7 @@ public class AStarAlgorithm
         //euclidean distance between a node and the end node is used as the cost value estimate.
         public float Estimate(Tile current, Tile target)
         {
-            return Vector3.Distance(target.TransformPosition, current.TransformPosition);
+            return Vector2.Distance(target.GridPosition, current.GridPosition);
         }
     }
 }

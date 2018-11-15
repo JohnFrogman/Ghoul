@@ -4,12 +4,12 @@ public class Grid
 {
     public Tile[,] Tiles { get; private set; }
 
-    public Grid(Vector2 tileDimensions, Vector2 levelSize)
+    public Grid(Vector2 levelSize)
     {
-        Build(tileDimensions, levelSize);
+        Build(levelSize);
     }
 
-	private void Build(Vector2 tileDimensions, Vector2 levelSize)
+	private void Build(Vector2 levelSize)
 	{
         Vector2 startPos = Vector2.zero;
         Tiles = new Tile[(int)levelSize.x, (int)levelSize.y];
@@ -18,8 +18,7 @@ public class Grid
 		{
 			for (int j = 0; j < levelSize.y; j++) 
 			{
-                var tilePos = startPos + tileDimensions;
-                var tile = new Tile(tilePos, new Vector2Int(i, j));
+                var tile = new Tile(new Vector2Int(i, j));
 				Tiles[i, j] = tile;
 
                 if(j>0)
@@ -31,12 +30,9 @@ public class Grid
                 {
                     SetNeighbours(tile, Tiles[i - 1, j]);
                 }
-
-				startPos.y += tileDimensions.y;
 			}
 
 			startPos.y = 0;
-			startPos.x += tileDimensions.x;
 		}
 	}
 

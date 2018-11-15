@@ -19,9 +19,8 @@ public class Tile
         Floor,
     }
 
-    public Tile(Vector2 transformPos, Vector2Int gridPos)
+    public Tile(Vector2Int gridPos)
     {
-        TransformPosition = transformPos;
         GridPosition = gridPos;
     }
 }
