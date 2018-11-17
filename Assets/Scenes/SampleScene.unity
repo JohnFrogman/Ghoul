@@ -283,7 +283,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89205d8b024e4224ba6a90fb51894259, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GridSize: {x: 100, y: 100}
+  GridSize: {x: 50, y: 50}
   render: {fileID: 1152511865}
 --- !u!4 &864566166
 Transform:
@@ -325,6 +325,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b4add2870fb72a48872591a0b547c25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ChunkSize: 25
+  extent: 50
   MeshRendererPrefab: {fileID: 1299269262847138, guid: 14647308c866fe941955f250307edd72,
     type: 2}
 --- !u!4 &1152511866

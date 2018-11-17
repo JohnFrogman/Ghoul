@@ -9,10 +9,9 @@ public class Director : MonoBehaviour {
 
 	void Awake () {
 		var level = new Level(GridSize);
-		BSPAlgorithm.Apply(level, BSPAlgorithm.Parameters.Default, 100);
-		int count = 0;
-		Random.InitState((int)System.DateTime.Now.Ticks);
-		render.Init(level.Grid.Tiles, GridSize);	
+        BSPAlgorithm.Apply(level, BSPAlgorithm.Parameters.Default, 100);
+        Random.InitState((int)System.DateTime.Now.Ticks);
+        render.Init(level.Grid.Tiles, GridSize);	
 	}
 
 }
