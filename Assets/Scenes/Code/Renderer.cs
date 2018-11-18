@@ -11,6 +11,8 @@ public class Renderer : MonoBehaviour
     int extent = 25;
     [SerializeField]
 	GameObject MeshRendererPrefab;
+	[SerializeField]
+	GameObject GridColliderPrefab;
     Tile[,][,] ChunkGrid;
     Vector2Int gridSize;
     public void Init(Tile[,] grid, Vector2Int GridSize)
@@ -18,23 +20,45 @@ public class Renderer : MonoBehaviour
         gridSize = GridSize;
 		int xChunks = GridSize.x / ChunkSize + ((GridSize.x % ChunkSize == 0) ? 0 : 1);
 		int yChunks = GridSize.y / ChunkSize + ((GridSize.y % ChunkSize == 0) ? 0 : 1);
-		ChunkGrid = new Tile[xChunks,yChunks][,]; //[ChunkSize, ChunkSize]
+		ChunkGrid = new Tile[xChunks,yChunks][,];
 		for (int y = 0; y < yChunks; y++) {
 			for (int x = 0; x < xChunks; x++) {
-                ChunkGrid[x, y] = new Tile[ChunkSize, ChunkSize];
-                for (int j = 0; j < ChunkSize; j++) {
-					for (int i = 0; i < ChunkSize; i++) {
-						if (grid [i + (x * ChunkSize), j + (y * ChunkSize)] != null)
-							ChunkGrid [x, y] [i, j] = grid [i + (x * ChunkSize), j + (y * ChunkSize)];
+                // Build a smaller chunk when necessary 
+                int xSize = ChunkSize, ySize = ChunkSize;
+                if (x == GridSize.x / ChunkSize && GridSize.x % ChunkSize != 0)
+                    xSize = gridSize.x - (ChunkSize * (xChunks - 1));
+                if (y == GridSize.y / ChunkSize && GridSize.y % ChunkSize != 0)
+                    ySize = gridSize.y - (ChunkSize * (yChunks - 1));
+
+                ChunkGrid[x, y] = new Tile[xSize, ySize];
+                for (int j = 0; j < ySize; j++) {
+					for (int i = 0; i < xSize; i++) {
+						ChunkGrid [x, y] [i, j] = grid [i + (x * ChunkSize), j + (y * ChunkSize)];
 					}
 				}	
 			}
-		} 
-		for (int z = 0; z < xChunks; z++)
-			for (int x = 0; x < yChunks; x++)
-				RenderChunk(ChunkGrid[x,z], new Vector2Int(x,z));
+		}
+        for (int z = 0; z < yChunks; z++)
+            for (int x = 0; x < xChunks; x++)
+            {
+                RenderChunk(ChunkGrid[x, z], new Vector2Int(x, z));
+            }
         RenderOuterMesh();
+		AttachCollider ();
     }
+	private void AttachCollider ()
+	{
+		Mesh mesh = new Mesh ();
+		Vector3[] vertices = new Vector3[4];
+		vertices [0] = new Vector3 (0, 0, 0); vertices [1] = new Vector3 (0, 0, gridSize.y); vertices [2] = new Vector3 (gridSize.x, 0, gridSize.y); vertices [3] = new Vector3 (gridSize.x, 0, 0);
+		List<int> triangles = new List<int> ();
+		triangles.AddRange(new int[] { 0,1,2 }); triangles.AddRange(new int[] { 0,2,3 });
+		mesh.vertices = vertices;
+		mesh.triangles = triangles.ToArray ();
+		GameObject obj = Instantiate(GridColliderPrefab, new Vector3(0,0,0), Quaternion.identity);
+		obj.GetComponent<MeshFilter>().mesh = mesh;
+		obj.GetComponent<MeshCollider> ().sharedMesh = mesh;
+	}
     private void RenderChunk(Tile[,] Chunk, Vector2Int ChunkCoords)
     {
         Vector3[] vertices = new Vector3[2 * (ChunkSize + 1) * (ChunkSize + 1)];
@@ -91,7 +115,8 @@ public class Renderer : MonoBehaviour
                 else if (Chunk[ChunkX - 1, ChunkY].Type == Tile.Types.Floor) // left neighbour
                     LeftWall = true;
                 // -----------------------
-                if (ChunkX == ChunkSize - 1)
+                
+                if (ChunkX == Chunk.GetLength(0) - 1)
                 {
                     if ((ChunkCoords.x != ChunkGrid.GetLength(0) - 1) && (ChunkGrid[ChunkCoords.x + 1, ChunkCoords.y][0, ChunkY].Type == Tile.Types.Floor))
                         RightWall = true;
@@ -99,12 +124,12 @@ public class Renderer : MonoBehaviour
                 else if (Chunk[ChunkX + 1, ChunkY].Type == Tile.Types.Floor) // right neighbour
                     RightWall = true;
                 // -----------------------
-                if (ChunkY == ChunkSize - 1)
+                if (ChunkY == Chunk.GetLength(1) - 1)
                 {
                     if ((ChunkCoords.y != ChunkGrid.GetLength(1) - 1) && (ChunkGrid[ChunkCoords.x, ChunkCoords.y + 1][ChunkX, 0].Type == Tile.Types.Floor))
                         TopWall = true;
                 }
-                else if (Chunk[ChunkX, ChunkY + 1].Type == Tile.Types.Floor) // top neighbour
+                else if (t.GridPosition.y + 1 < gridSize.y && Chunk[ChunkX, ChunkY + 1].Type == Tile.Types.Floor) // top neighbour
                     TopWall = true;
                 // -----------------------
                 if (ChunkY == 0)
